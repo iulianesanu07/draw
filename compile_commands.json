@@ -1,0 +1,110 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/EBO.o",
+      "src/EBO.cpp"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/EBO.cpp",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/EBO.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/VAO.o",
+      "src/VAO.cpp"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/VAO.cpp",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/VAO.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/VBO.o",
+      "src/VBO.cpp"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/VBO.cpp",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/VBO.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/main.o",
+      "src/main.cpp"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/main.cpp",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/shaderClass.o",
+      "src/shaderClass.cpp"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/shaderClass.cpp",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/shaderClass.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-Iinclude",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/gl.o",
+      "src/gl.c"
+    ],
+    "directory": "/Users/iulianesanu/Documents/projects/draw",
+    "file": "/Users/iulianesanu/Documents/projects/draw/src/gl.c",
+    "output": "/Users/iulianesanu/Documents/projects/draw/obj/gl.o"
+  }
+]
