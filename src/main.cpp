@@ -2,48 +2,38 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <stb/stb_image.h>
+
 
 #include "EBO.hpp"
 #include "VAO.hpp"
 #include "VBO.hpp"
 #include "shaderClass.hpp"
+#include "camera.hpp"
 
 #define GL_SILENCE_DEPRECATION
 
-void mouse_button_callback(GLFWwindow *window, int button, int action,
-                           int mods) {
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    std::cout << "Clic détecté aux coordonnées écran : (" << xpos << ", "
-              << ypos << ")\n";
-  }
-}
+// Vertices coordinates
+GLfloat vertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+     -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Lower left corner
+     -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   0.0f, 1.0f, // Upper left corner
+      0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,   1.0f, 1.0f, // Upper right corner
+      0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,   1.0f, 0.0f  // Lower right corner
+};
 
-std::vector<float> generateCircleVertices(float centerX, float centerY,
-                                          float radius, int segments = 20) {
-  std::vector<float> vertices;
-
-  // Triangle fan: centre + segments
-  vertices.push_back(centerX);
-  vertices.push_back(centerY);
-
-  for (int i = 0; i <= segments; ++i) {
-    float angle = (2.0f * M_PI * i) / segments;
-    float x = centerX + radius * cos(angle);
-    float y = centerY + radius * sin(angle);
-    vertices.push_back(x);
-    vertices.push_back(y);
-  }
-
-  return vertices;
-}
+// Indices for vertices order
+GLuint indices[] = 
+{
+    0, 2, 1, // Upper triangle
+    0, 3, 2
+};
 
 int main() {
   
   int height = 1000;
   int weigth = 1000;
-  int windowScaler = 2;
+  int windowScaler = 1;
 
 
   if (!glfwInit()) {
@@ -51,7 +41,6 @@ int main() {
     return -1;
   }
 
-  // On force le Core Profile OpenGL 4.1 (macOS support max)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -59,16 +48,6 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Spécifique macOS
 #endif
 
-  GLfloat vertices[] = {
-      -0.5f,     -0.5f * float(sqrt(3)) / 3,    // Lower left corner
-      0.5f,      -0.5f * float(sqrt(3)) / 3,    // Lower right corner
-      0.0f,      0.5f * float(sqrt(3)) * 2 / 3, // Upper corner
-      -0.5f / 2, 0.5f * float(sqrt(3)) / 6,     // Inner left
-      0.5f / 2,  0.5f * float(sqrt(3)) / 6,     // Inner right
-      0.0f,      -0.5f * float(sqrt(3)) / 3     // Inner down
-  };
-
-  GLuint indices[] = {0, 3, 5, 3, 2, 4, 5, 4, 1};
 
   std::vector<glm::vec2> clickPositions;
 
@@ -81,12 +60,13 @@ int main() {
   }
 
   glfwMakeContextCurrent(window);
-  glfwSetMouseButtonCallback(window, mouse_button_callback);
 
   if (!gladLoadGL(glfwGetProcAddress)) {
     std::cerr << "Failed to initialize GLAD\n";
     return -1;
   }
+
+  glViewport(0, 0, height * windowScaler, weigth * windowScaler);
 
   Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
 
@@ -96,76 +76,26 @@ int main() {
   VBO VBO1(vertices, sizeof(vertices));
   EBO EBO1(indices, sizeof(indices));
 
-  VAO1.LinkAttrib(VBO1, 0, 2, GL_FLOAT, 2 * sizeof(float), (void *)0);
+  VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);
+  VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+  VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 
   VAO1.Unbind();
   VBO1.Unbind();
   EBO1.Unbind();
 
-  shaderProgram.Activate();
-  VAO1.Bind();
+  GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
   while (!glfwWindowShouldClose(window)) {
-    /*
-    glEnable(GL_SCISSOR_TEST); // active la découpe par zone
-
-    // === Zone principale (gauche, gris)
-    glViewport(0, 0, 600, 450);
-    glScissor(0, 0, 600, 450); // Limite le clear à cette zone
+   
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
     shaderProgram.Activate();
+    glUniform1f(uniID, 0.5f);
     VAO1.Bind();
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 
-    // === Panneau latéral (droite, moins gris)
-    glViewport(600, 0, 200, 450);
-    glScissor(600, 0, 200, 450);
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glDisable(GL_SCISSOR_TEST); // désactivation optionnelle
-    */
-
-    glViewport(0, 0, height * windowScaler, weigth * windowScaler);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glUniform3f(glGetUniformLocation(shaderProgram.ID, "colorUni"), 1.0f, 1.0f,
-                0.0f);
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
-
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-      double xpos, ypos;
-      glfwGetCursorPos(window, &xpos, &ypos);
-
-      int width, height;
-      glfwGetWindowSize(window, &width, &height);
-
-      float oglX = (xpos / width) * 2.0f - 1.0f;
-      float oglY = -((ypos / height) * 2.0f - 1.0f);
-
-      std::cout << "Clic maintenu - Coordonnées OpenGL : (" << oglX << ", "
-                << oglY << ")\n";
-
-      clickPositions.emplace_back(oglX, oglY);
-    }
-
-    for (const auto &pos : clickPositions) {
-      auto circleVerts =
-          generateCircleVertices(pos.x, pos.y, 0.02f); // petit rayon
-
-      // Crée VBO/VAO à la volée (pas optimal mais simple)
-      VAO circleVAO;
-      circleVAO.Bind();
-      VBO circleVBO(circleVerts.data(), circleVerts.size() * sizeof(float));
-      circleVAO.LinkAttrib(circleVBO, 0, 2, GL_FLOAT, 2 * sizeof(float),
-                           (void *)0);
-
-      glDrawArrays(GL_TRIANGLE_FAN, 0, circleVerts.size() / 2);
-
-      circleVBO.Delete();
-      circleVAO.Delete();
-    }
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
