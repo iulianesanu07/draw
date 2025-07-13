@@ -10,6 +10,7 @@
 #include "VBO.hpp"
 #include "shaderClass.hpp"
 #include "camera.hpp"
+#include "texture.hpp"
 
 #define GL_SILENCE_DEPRECATION
 
@@ -32,7 +33,7 @@ GLuint indices[] =
 int main() {
   
   int height = 1000;
-  int weigth = 1000;
+  int width = 1000;
   int windowScaler = 1;
 
 
@@ -52,7 +53,7 @@ int main() {
   std::vector<glm::vec2> clickPositions;
 
   GLFWwindow *window =
-      glfwCreateWindow(height, weigth, "Test OpenGL + GLAD", nullptr, nullptr);
+      glfwCreateWindow(height, width, "Test OpenGL + GLAD", nullptr, nullptr);
   if (!window) {
     std::cerr << "Failed to create GLFW window\n";
     glfwTerminate();
@@ -66,7 +67,7 @@ int main() {
     return -1;
   }
 
-  glViewport(0, 0, height * windowScaler, weigth * windowScaler);
+  glViewport(0, 0, height * windowScaler, width * windowScaler);
 
   Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
 
@@ -86,6 +87,12 @@ int main() {
 
   GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
+  // Texture
+  
+  Texture pop_cat("res/images/pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+  pop_cat.texUnit(shaderProgram, "tex0", 0);
+
+
   while (!glfwWindowShouldClose(window)) {
    
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -93,6 +100,7 @@ int main() {
 
     shaderProgram.Activate();
     glUniform1f(uniID, 0.5f);
+    pop_cat.Bind();
     VAO1.Bind();
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -104,6 +112,7 @@ int main() {
   VAO1.Delete();
   VBO1.Delete();
   EBO1.Delete();
+  pop_cat.Delete();
   shaderProgram.Delete();
 
   glfwDestroyWindow(window);
