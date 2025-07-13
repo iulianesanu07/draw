@@ -14,6 +14,7 @@
 
 #define GL_SILENCE_DEPRECATION
 
+/*
 // Vertices coordinates
 GLfloat vertices[] =
 { //     COORDINATES     /        COLORS      /   TexCoord  //
@@ -29,12 +30,35 @@ GLuint indices[] =
     0, 2, 1, // Upper triangle
     0, 3, 2
 };
+*/
+
+
+// Vertices coordinates
+GLfloat vertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+};
+
+// Indices for vertices order
+GLuint indices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4
+};
 
 int main() {
   
   int height = 1000;
   int width = 1000;
-  int windowScaler = 1;
+  int windowScaler = 2;
 
 
   if (!glfwInit()) {
@@ -48,9 +72,6 @@ int main() {
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Spécifique macOS
 #endif
-
-
-  std::vector<glm::vec2> clickPositions;
 
   GLFWwindow *window =
       glfwCreateWindow(height, width, "Test OpenGL + GLAD", nullptr, nullptr);
@@ -85,25 +106,29 @@ int main() {
   VBO1.Unbind();
   EBO1.Unbind();
 
-  GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
-
   // Texture
-  
   Texture pop_cat("res/images/pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
   pop_cat.texUnit(shaderProgram, "tex0", 0);
 
+  glEnable(GL_DEPTH_TEST);
+
+  
+  // Camera
+  Camera camera(width, height, glm::vec3(0.0f, 5.0f, 0.0f));
 
   while (!glfwWindowShouldClose(window)) {
    
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shaderProgram.Activate();
-    glUniform1f(uniID, 0.5f);
+
+    camera.Inputs(window);
+    camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+
     pop_cat.Bind();
     VAO1.Bind();
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
