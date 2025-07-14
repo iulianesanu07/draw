@@ -58,7 +58,7 @@ int main() {
   
   int height = 1000;
   int width = 1000;
-  int windowScaler = 2;
+  int windowScaler = 1;
 
 
   if (!glfwInit()) {

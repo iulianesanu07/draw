@@ -30,42 +30,59 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
 void Camera::Inputs(GLFWwindow* window)
 {
 	// Handles key inputs
-  if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+  if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // fonction d'affichage d'informations sur la camera
   {
     printf("Vecteur orientation : %.2f, %.2f, %.2f\n", Orientation.x, Orientation.y, Orientation.z);
+    printf("Vecteur position : %.2f, %.2f, %.2f\n\n", Position.x, Position.y, Position.z);
   }
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		Position += speed * Orientation;
-	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		Position += speed * -glm::normalize(glm::cross(Orientation, Up));
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		Position += speed * -Orientation;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		Position += speed * glm::normalize(glm::cross(Orientation, Up));
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		Position += speed * Up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		Position += speed * -Up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		speed = 0.4f;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-	{
-		speed = 0.1f;
-	}
+
+  // Gestion deplacement camera (click droit)
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+  {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    if (firstClick)
+    {
+      lastX = mouseX;
+      lastY = mouseY;
+      firstClick = false;
+      return;
+    }
+
+    double deltaX = mouseX - lastX;
+    double deltaY = mouseY - lastY;
+
+    printf("Delta x : %.2f \t", deltaX);
+    printf("Delta y : %.2f \t\n\n", deltaY);
+
+    Position.z += -deltaX * 0.001f;
+    Position.x += deltaY * 0.001f;
+
+  }
+  else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) 
+  {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    firstClick = true;
+  }
 
 
 	// Handles mouse inputs
