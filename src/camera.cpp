@@ -71,11 +71,14 @@ void Camera::Inputs(GLFWwindow* window)
     double deltaX = mouseX - lastX;
     double deltaY = mouseY - lastY;
 
+    lastX = mouseX;
+    lastY = mouseY;
+
     printf("Delta x : %.2f \t", deltaX);
     printf("Delta y : %.2f \t\n\n", deltaY);
 
-    Position.z += -deltaX * 0.001f;
-    Position.x += deltaY * 0.001f;
+    Position.z += -deltaX * 0.01f;
+    Position.x += deltaY * 0.01f;
 
   }
   else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) 
@@ -86,6 +89,7 @@ void Camera::Inputs(GLFWwindow* window)
 
 
 	// Handles mouse inputs
+  /*
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		// Hides mouse cursor
@@ -131,4 +135,5 @@ void Camera::Inputs(GLFWwindow* window)
 		// Makes sure the next time the camera looks around it doesn't jump
 		firstClick = true;
 	}
+  */
 }
