@@ -88,6 +88,13 @@ int main() {
     return -1;
   }
 
+  // Test raw inputs de la souris (ca marche pas sur macos 26)
+  if (glfwRawMouseMotionSupported()) {
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+  } else {
+    std::cerr << "Raw mouse motion non supporte." << std::endl;
+  }
+
   glViewport(0, 0, height * windowScaler, width * windowScaler);
 
   Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
